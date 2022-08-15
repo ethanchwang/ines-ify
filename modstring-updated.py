@@ -41,7 +41,6 @@ def get_adjacent_chars(char:str):
 
     return adjacent_key_distances
 
-
 def get_adjacent_chars2(char:str):
     qwerty = np.array(
         [np.array(['Q','W','E','R','T','Y','U','I','O','P'])
@@ -54,7 +53,6 @@ def get_adjacent_chars2(char:str):
     adjacent_key_distances = {letter : distance_between_keys(k1=letter,k2=char,keyboard=qwerty) for letter in letters if (char != letter) and (distance_between_keys(k1=letter,k2=char,keyboard=qwerty)<2)}
 
     return adjacent_key_distances
-
 
 def softmax_dict_values(input):
     softmax_values = softmax(list(input.values()))
