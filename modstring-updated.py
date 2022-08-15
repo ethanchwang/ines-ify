@@ -101,9 +101,6 @@ def randomize_str(text:str,spelling_ability:float):
     french= False;
     if np.random.random()<spelling_ability:
         french = True;
-        print("french")
-    else:
-        print("nf")
 
     for char in tqdm(text):
         if char not in list(string.ascii_lowercase+string.ascii_uppercase):
