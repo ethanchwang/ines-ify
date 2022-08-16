@@ -29,11 +29,9 @@ def distance_between_keys(k1,k2,keyboard):
     return sqrt(pow(k1_row-k2_row,2)+pow(k1_dist_to_center-k2_dist_to_center,2))
 
 def get_adjacent_chars(char:str):
-    qwerty = np.array(
-        [np.array(['q','w','e','r','t','y','u','i','o','p'])
-        ,np.array(  ['a','s','d','f','g','h','j','k','l'])
-        ,np.array(      ['z','x','c','v','b','n','m'])]
-        ,dtype=object)
+    qwerty = [['q','w','e','r','t','y','u','i','o','p']
+        ,['a','s','d','f','g','h','j','k','l']
+        ,['z','x','c','v','b','n','m']]
 
     if char.islower():
         return {letter : distance_between_keys(k1=letter,k2=char,keyboard=qwerty) for letter in ascii_lowercase if (char != letter) and (distance_between_keys(k1=letter,k2=char,keyboard=qwerty)<2)}
