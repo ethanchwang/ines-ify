@@ -1,6 +1,6 @@
 from math import sqrt
 import numpy as np
-import string
+from string import ascii_lowercase,ascii_uppercase
 from tqdm import tqdm
 
 #return index of 1st instance of value in 2d array
@@ -35,23 +35,32 @@ def get_adjacent_chars(char:str):
         ,np.array(      ['z','x','c','v','b','n','m'])]
         ,dtype=object)
 
-    letters = list(string.ascii_lowercase)
-
-    adjacent_key_distances = {letter : distance_between_keys(k1=letter,k2=char,keyboard=qwerty) for letter in letters if (char != letter) and (distance_between_keys(k1=letter,k2=char,keyboard=qwerty)<2)}
-
-    return adjacent_key_distances
+    if char.islower():
+        return {letter : distance_between_keys(k1=letter,k2=char,keyboard=qwerty) for letter in ascii_lowercase if (char != letter) and (distance_between_keys(k1=letter,k2=char,keyboard=qwerty)<2)}
+    if char.isupper():
+        return {letter.upper() : distance_between_keys(k1=letter,k2=char.lower(),keyboard=qwerty) for letter in ascii_lowercase if (char.lower() != letter) and (distance_between_keys(k1=letter,k2=char.lower(),keyboard=qwerty)<2)}
 
 def softmax_dict_values(input):
     softmax_values = softmax(list(input.values()))
     return {list(input.keys())[idx]:softmax_values[idx] for idx in range(len(input))}
 
-def randomize_letter(char:str,spelling_ability:float):
-    adjacent_key_distances = get_adjacent_chars(char=char)
+def addAccent(char:str):
+    french_lookup = {
+            'a':[u'\u0300',u'\u0302',u'\u0308']
+        ,   'e':[u'\u0300',u'\u0302',u'\u0308',u'\u0301']
+        ,   'i':[u'\u0308',u'\u0302']
+        ,   'o':[u'\u0302']
+        ,   'u':[u'\u0300',u'\u0302',u'\u0308']
+        ,   'c':[u'\u031C']
+    }
+    return char+np.random.choice(french_lookup[char]);
 
-    seed = np.random.random()
+def randomize_letter(char:str,spelling_ability:float):
+
+    adjacent_key_distances = get_adjacent_chars(char=char)
     
     #sometimes, ines spells correctly!
-    if spelling_ability<seed:
+    if spelling_ability<np.random.random():
         return char
 
     #invert the distances so farther means less likely
@@ -67,23 +76,28 @@ def randomize_letter(char:str,spelling_ability:float):
     cumulative_probability = 0
     for probability,letter in key_probabilities:
         cumulative_probability += probability
-        if cumulative_probability>seed:
-            return letter
+        return letter
 
 def randomize_str(text:str,spelling_ability:float):
     output = ''
 
     for char in tqdm(text):
-        if char not in list(string.ascii_lowercase):
+        if char not in list(ascii_lowercase+ascii_uppercase):
             output += char
             continue
         output += randomize_letter(char=char,spelling_ability=spelling_ability)
+        if np.random.random()<spelling_ability/8:
+            output+= " ";
+    
+    #french kb is on
+    if np.random.random()<spelling_ability:
+        output = ''.join([addAccent(char) if (np.random.random()<spelling_ability/1.5 and char in list("aeiouc")) else char for char in output])
 
     return output
 
 def main():
-    ines_bac = .2
-    text = 'hello i am ines'
+    ines_bac = .2;
+    text = 'Hello I am Ines and I am typing a sentence!'
 
     print(randomize_str(text=text,spelling_ability=ines_bac))
 
